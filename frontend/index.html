@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Author Identifier | Professional Handwriting Analysis</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.14);
+      --text: #eaf0ff;
+      --muted: rgba(234, 240, 255, 0.7);
+      --accent: #6ea8ff;
+      --accent-2: #8b5cf6;
+      --danger: #ff6b6b;
+      --success: #2ee59d;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Floating Background Elements */
+    .blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+      opacity: 0.15;
+      filter: blur(80px);
+      z-index: -1;
+      animation: float 20s infinite alternate ease-in-out;
+    }
+
+    .blob-1 {
+      top: -100px;
+      left: -100px;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    }
+
+    .blob-2 {
+      bottom: -100px;
+      right: -100px;
+      background: radial-gradient(circle, var(--accent-2) 0%, transparent 70%);
+      animation-delay: -5s;
+    }
+
+    .blob-3 {
+      top: 40%;
+      left: 60%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--success) 0%, transparent 70%);
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      100% {
+        transform: translate(100px, 50px) scale(1.1);
+      }
+    }
+
+    .container {
+      width: min(850px, 100%);
+      display: grid;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 24px;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 850;
+      background: linear-gradient(135deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .drop-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      display: grid;
+      gap: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .drop-zone:hover {
+      border-color: var(--accent);
+      background: rgba(110, 168, 255, 0.05);
+    }
+
+    .preview-container {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    #previewImg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 20px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(110, 168, 255, 0.3);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: grayscale(0.5);
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .result-section {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .result-box {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .author-name {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .confidence-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .confidence-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--success));
+      transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    .status-msg {
+      font-size: 14px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    .status-msg.error {
+      border-left-color: var(--danger);
+      background: rgba(255, 107, 107, 0.1);
+      color: #ffbcbc;
+    }
+
+    .status-msg.success {
+      border-left-color: var(--success);
+      background: rgba(46, 229, 157, 0.1);
+      color: #bcffde;
+    }
+
+    .pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      color: var(--muted);
+    }
+
+    /* Loader */
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <div class="container">
+    <header class="card header">
+      <h1 class="title">Handwriting Analysis</h1>
+      <p class="subtitle">
+        Powered by Deep Learning. Our model analyzes character structure to identify authors with high precision.
+      </p>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <input id="fileInput" type="file" accept="image/*" style="display: none;" />
+
+          <div class="preview-container">
+            <img id="previewImg" alt="Thumbnail" />
+            <div class="hint" id="previewHint">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+              <span>Click to upload handwriting sample</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="fileName" class="pill">No file selected</span>
+            <button class="btn secondary" id="clearBtn" disabled
+              onclick="event.stopPropagation(); clearAll()">Remove</button>
+          </div>
+        </div>
+
+        <button class="btn" id="identifyBtn" disabled style="width: 100%; margin-top: 16px;">
+          <span class="loader" id="loader"></span>
+          <span id="btnText">Execute Analysis</span>
+        </button>
+      </section>
+
+      <section class="card result-section">
+        <label class="pill" style="width: fit-content;">Detection Result</label>
+        <div class="result-box">
+          <div class="author-name" id="authorName">Waiting...</div>
+          <div class="status-msg" id="statusMessage">Upload an image to identify the author.</div>
+
+          <div class="confidence-wrap" id="confidenceWrap" style="opacity: 0;">
+            <div class="confidence-label">
+              <span>Predictive Confidence</span>
+              <span id="confidenceValue">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px;">
+      Deep Learning Project &bull; Hand-writing Recognition API &bull; v2.1 (Confidence Enabled)
+    </footer>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/predict";
+    const fileInput = document.getElementById("fileInput");
+    const previewImg = document.getElementById("previewImg");
+    const previewHint = document.getElementById("previewHint");
+    const fileName = document.getElementById("fileName");
+    const identifyBtn = document.getElementById("identifyBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const loader = document.getElementById("loader");
+    const btnText = document.getElementById("btnText");
+    const authorName = document.getElementById("authorName");
+    const statusMsg = document.getElementById("statusMessage");
+    const confidenceWrap = document.getElementById("confidenceWrap");
+    const confidenceValue = document.getElementById("confidenceValue");
+    const progressFill = document.getElementById("progressFill");
+
+    let selectedFile = null;
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        showStatus("Invalid file type. Please upload an image.", "error");
+        return;
+      }
+
+      selectedFile = file;
+      fileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        previewImg.src = ev.target.result;
+        previewImg.style.display = "block";
+        previewHint.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+
+      identifyBtn.disabled = false;
+      clearBtn.disabled = false;
+      showStatus("Sample loaded. Ready for analysis.");
+      resetResultUI();
+    });
+
+    function clearAll() {
+      selectedFile = null;
+      fileInput.value = "";
+      previewImg.src = "";
+      previewImg.style.display = "none";
+      previewHint.style.display = "flex";
+      fileName.textContent = "No file selected";
+      identifyBtn.disabled = true;
+      clearBtn.disabled = true;
+      resetResultUI();
+      showStatus("Upload an image to identify the author.");
+    }
+
+    function resetResultUI() {
+      authorName.textContent = "Waiting...";
+      confidenceWrap.style.opacity = "0";
+      progressFill.style.width = "0%";
+      confidenceValue.textContent = "0%";
+    }
+
+    function showStatus(msg, type = "info") {
+      statusMsg.textContent = msg;
+      statusMsg.className = "status-msg " + type;
+    }
+
+    identifyBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+
+      identifyBtn.disabled = true;
+      loader.style.display = "inline-block";
+      btnText.textContent = "Analyzing...";
+      showStatus("Transmitting to backend...");
+      resetResultUI();
+
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "Server error occurred");
+        }
+
+        const data = await response.json();
+
+        // Success Logic
+        authorName.textContent = data.author;
+
+        if (data.confidence !== undefined) {
+          confidenceWrap.style.opacity = "1";
+          const percent = Math.round(data.confidence * 100);
+
+          // Animate progress
+          setTimeout(() => {
+            progressFill.style.width = percent + "%";
+            confidenceValue.textContent = percent + "%";
+          }, 100);
+        }
+
+        if (data.author === "Unknown") {
+          showStatus(data.message || "Low confidence prediction.", "error");
+        } else {
+          showStatus("Analysis Complete. Identity verified.", "success");
+        }
+
+      } catch (err) {
+        authorName.textContent = "Error";
+        showStatus(err.message, "error");
+      } finally {
+        identifyBtn.disabled = false;
+        loader.style.display = "none";
+        btnText.textContent = "Execute Analysis";
+      }
+    });
+
+    // Drag and Drop
+    const dropZone = document.getElementById("dropZone");
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+      dropZone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+    dropZone.addEventListener('dragover', () => dropZone.style.borderColor = 'var(--accent)');
+    dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'rgba(255,255,255,0.15)');
+    dropZone.addEventListener('drop', (e) => {
+      dropZone.style.borderColor = 'rgba(255,255,255,0.15)';
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        fileInput.dispatchEvent(new Event('change'));
+      }
+    });
+
+  </script>
+</body>
+
+</html>

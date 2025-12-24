@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.venv311/
+venv/
+ENV/
+
+# Project Specific
+test_dir/
+train_dir/
+*.log
+result.csv
+
+# AI/Model
+.ipynb_checkpoints/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Agent files
+.gemini/
+.system_generated/
+brain/
+task.md
+implementation_plan.md
+walkthrough.md
