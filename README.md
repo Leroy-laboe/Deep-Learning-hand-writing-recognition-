@@ -23,7 +23,7 @@ A deep learning-based application that identifies the author of handwritten text
 
 1. **Download or Clone the project:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/hand-writing-recognition.git
+   git clone https://github.com/Leroy-laboe/Deep-Learning-hand-writing-recognition-
    cd hand-writing-recognition
    ```
 
