@@ -1,4 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 import cv2
@@ -53,20 +55,19 @@ patch_keras_preprocessing()
 # -------------------------------------------------
 # App setup
 # -------------------------------------------------
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # dev only
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # -------------------------------------------------
 # Paths (absolute, stable)
 # -------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
 MODEL_PATH = BASE_DIR / "model.keras"
 LABELS_PATH = BASE_DIR / "labels.json"
+
+# Serve frontend at root
+@app.get("/")
+async def read_index():
+    return FileResponse(FRONTEND_DIR / "index.html")
+
 
 model = None
 idx_to_label = {}
