@@ -13,10 +13,8 @@ RUN apt-get update && apt-get install -y \
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install dependencies
-# Using tensorflow-cpu to keep the image smaller and avoid GPU overhead
-RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir tensorflow-cpu
+# Install application and ML dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
 COPY . .
