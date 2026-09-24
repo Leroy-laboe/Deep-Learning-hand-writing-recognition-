@@ -3,10 +3,7 @@ To run run.py
 python run.py --test_dir test_dir --model model.keras --labels labels.json --out result.csv
 """
 
-import keras_compat  # must be imported before load_model()
-from keras.models import load_model
-
-
+import keras_compat  # must be imported before loading the saved model
 
 import os, json, csv
 import cv2
@@ -24,9 +21,6 @@ parser.add_argument("--char_h",type=int,default=64)
 parser.add_argument("--char_w",type=int,default=64)
 parser.add_argument("--min_char_width",type=int,default=6)
 args=parser.parse_args()
-
-# Register compatibility wrappers for preprocessing layers
-import keras_compat  # ensures load_model tolerates `value_range` in saved layer configs
 
 # Load
 model=load_model(args.model)
