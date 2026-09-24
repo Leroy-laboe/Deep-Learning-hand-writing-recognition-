@@ -120,12 +120,6 @@ except Exception:
 # -------------------------------------------------
 def to_grayscale(img):
     if len(img.shape) == 3:
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # wait, cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) is in run.py
-    return img
-
-# Correction from run.py:
-def to_grayscale_real(img):
-    if len(img.shape) == 3:
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
 
@@ -156,7 +150,7 @@ def segment_lines(gray):
 
 
 def segment_words_from_line(line_img):
-    gray = to_grayscale_real(line_img)
+    gray = to_grayscale(line_img)
     _, th = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 3))
     dilated = cv2.dilate(th, kernel, iterations=1)
@@ -172,7 +166,7 @@ def segment_words_from_line(line_img):
 
 
 def segment_chars_from_word(word_img, min_char_width=4):
-    gray = to_grayscale_real(word_img)
+    gray = to_grayscale(word_img)
     _, th = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     cols = np.sum(th, axis=0)
     thresh = max(1, int(0.05 * cols.max()))
@@ -236,7 +230,7 @@ async def predict(file: UploadFile = File(...)):
     # -------------------------------------------------
     # Segmentation (matching run.py and training)
     # -------------------------------------------------
-    gray = to_grayscale_real(img)
+    gray = to_grayscale(img)
     lines = segment_lines(gray)
     chars_imgs = []
 
