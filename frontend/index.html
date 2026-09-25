@@ -1,170 +1,279 @@
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Handwriting Author Identification | Deep Learning</title>
   <style>
     :root {
-      --bg: #0b1220;
-      --card: rgba(255, 255, 255, 0.08);
-      --card-border: rgba(255, 255, 255, 0.14);
-      --text: #eaf0ff;
-      --muted: rgba(234, 240, 255, 0.7);
-      --accent: #6ea8ff;
-      --accent-2: #8b5cf6;
-      --danger: #ff6b6b;
-      --success: #2ee59d;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-      --radius: 20px;
+      --bg: #f5f7f8;
+      --surface: #ffffff;
+      --surface-soft: #f8fafb;
+      --ink: #16201d;
+      --muted: #69736f;
+      --line: #dfe5e2;
+      --accent: #174f43;
+      --accent-strong: #0f3c33;
+      --accent-soft: #e9f2ef;
+      --success: #1c7a54;
+      --danger: #a33d3d;
+      --shadow: 0 24px 70px rgba(18, 38, 32, 0.10);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      background: var(--bg);
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      overflow-x: hidden;
-      position: relative;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(180deg, #eef3f1 0, #f7f9f8 260px, var(--bg) 100%);
+      color: var(--ink);
     }
 
-    /* Floating Background Elements */
-    .blob {
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-      opacity: 0.15;
-      filter: blur(80px);
-      z-index: -1;
-      animation: float 20s infinite alternate ease-in-out;
+    button, input { font: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
     }
 
-    .blob-1 {
-      top: -100px;
-      left: -100px;
-      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-    }
-
-    .blob-2 {
-      bottom: -100px;
-      right: -100px;
-      background: radial-gradient(circle, var(--accent-2) 0%, transparent 70%);
-      animation-delay: -5s;
-    }
-
-    .blob-3 {
-      top: 40%;
-      left: 60%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, var(--success) 0%, transparent 70%);
-      animation-delay: -10s;
-    }
-
-    @keyframes float {
-      0% {
-        transform: translate(0, 0) scale(1);
-      }
-
-      100% {
-        transform: translate(100px, 50px) scale(1.1);
-      }
-    }
-
-    .container {
-      width: min(850px, 100%);
-      display: grid;
-      gap: 20px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--card-border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 24px;
-      transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-
-    .card:hover {
-      border-color: rgba(255, 255, 255, 0.25);
-    }
-
-    .header {
+    .topbar {
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
       gap: 12px;
     }
 
-    .title {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 850;
-      background: linear-gradient(135deg, #fff 30%, var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: -0.5px;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .grid {
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 20px;
+      place-items: center;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      box-shadow: 0 8px 24px rgba(23, 79, 67, 0.18);
     }
 
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    .brand-copy strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-copy span {
+      display: block;
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .top-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .meta-pill {
+      border: 1px solid rgba(23,79,67,.16);
+      background: rgba(255,255,255,.74);
+      color: var(--accent-strong);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .hero-card,
+    .metric-card,
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      border-radius: var(--radius-lg);
+      padding: 34px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: .98;
+      letter-spacing: -0.055em;
+      font-weight: 760;
+    }
+
+    .hero-copy {
+      margin: 18px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .metric-card {
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 132px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .metric-value {
+      margin-top: 16px;
+      font-size: 30px;
+      font-weight: 760;
+      letter-spacing: -0.04em;
+    }
+
+    .metric-note {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.22fr) minmax(320px, .78fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+
+    .panel-kicker {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -0.025em;
+    }
+
+    .panel-subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .model-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .model-state::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #34a36e;
+      box-shadow: 0 0 0 4px rgba(52,163,110,.12);
     }
 
     .drop-zone {
-      border: 2px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.03);
-      display: grid;
-      gap: 16px;
-      transition: all 0.3s ease;
+      border: 1.5px dashed #b8c6c1;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: var(--surface-soft);
       cursor: pointer;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
     }
 
     .drop-zone:hover {
       border-color: var(--accent);
-      background: rgba(110, 168, 255, 0.05);
+      background: #f4f8f6;
     }
 
     .preview-container {
-      aspect-ratio: 16 / 9;
-      width: 100%;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 330px;
+      aspect-ratio: 16 / 10;
+      border-radius: 13px;
       overflow: hidden;
       display: grid;
       place-items: center;
-      background: rgba(0, 0, 0, 0.3);
+      background:
+        linear-gradient(135deg, #eef2f0 25%, transparent 25%) 0 0/20px 20px,
+        linear-gradient(225deg, #eef2f0 25%, transparent 25%) 0 0/20px 20px,
+        linear-gradient(315deg, #eef2f0 25%, transparent 25%) 10px 10px/20px 20px,
+        linear-gradient(45deg, #eef2f0 25%, #f8faf9 25%) 10px 10px/20px 20px;
+      border: 1px solid var(--line);
       position: relative;
     }
 
@@ -173,224 +282,382 @@
       height: 100%;
       object-fit: contain;
       display: none;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: scale(0.98);
-      }
-
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      background: #fff;
     }
 
     .hint {
-      color: var(--muted);
-      font-size: 14px;
+      max-width: 300px;
+      padding: 24px;
       text-align: center;
+      color: var(--muted);
+    }
+
+    .upload-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 16px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .hint strong {
+      display: block;
+      color: var(--ink);
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .hint span {
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .file-row {
+      margin-top: 12px;
       display: flex;
-      flex-direction: column;
       align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .file-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .button-row {
+      display: flex;
       gap: 10px;
+      margin-top: 14px;
     }
 
     .btn {
       border: 0;
+      min-height: 46px;
       border-radius: 12px;
-      padding: 12px 20px;
+      padding: 0 18px;
       cursor: pointer;
-      color: white;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      font-weight: 700;
-      font-size: 15px;
-      display: flex;
+      font-weight: 750;
+      transition: transform .16s ease, opacity .16s ease, background .16s ease;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 9px;
     }
 
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(110, 168, 255, 0.3);
-    }
-
-    .btn:active:not(:disabled) {
-      transform: translateY(0);
-    }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
 
     .btn:disabled {
-      opacity: 0.4;
+      opacity: .42;
       cursor: not-allowed;
-      filter: grayscale(0.5);
     }
+
+    .btn.primary {
+      flex: 1;
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .btn.primary:hover:not(:disabled) { background: var(--accent-strong); }
 
     .btn.secondary {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--ink);
+      background: #eef2f0;
+      border: 1px solid var(--line);
     }
 
-    .result-section {
+    .result-panel {
       display: flex;
       flex-direction: column;
-      gap: 16px;
     }
 
     .result-box {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-height: 330px;
+      flex: 1;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: #fbfcfc;
       padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      min-height: 200px;
-      position: relative;
-      overflow: hidden;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      text-transform: uppercase;
     }
 
     .author-name {
-      font-size: 32px;
-      font-weight: 900;
-      letter-spacing: -1px;
+      margin-top: 28px;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1;
+      font-weight: 760;
+      letter-spacing: -0.05em;
+    }
+
+    .status-msg {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f1f4f3;
+      border: 1px solid var(--line);
+    }
+
+    .status-msg.error {
+      color: var(--danger);
+      background: #fbf1f1;
+      border-color: #ecd0d0;
+    }
+
+    .status-msg.success {
+      color: var(--success);
+      background: #edf7f2;
+      border-color: #cfe9dc;
     }
 
     .confidence-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
       margin-top: auto;
+      padding-top: 28px;
+      transition: opacity .2s ease;
     }
 
     .confidence-label {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
       display: flex;
       justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
     }
 
     .progress-bar {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+      height: 9px;
+      background: #e5ebe8;
+      border-radius: 999px;
       overflow: hidden;
     }
 
     .progress-fill {
       height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--success));
-      transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+      width: 0;
+      background: var(--accent);
+      border-radius: inherit;
+      transition: width .65s cubic-bezier(.2,.75,.25,1);
     }
 
-    .status-msg {
-      font-size: 14px;
-      padding: 10px 14px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border-left: 3px solid var(--accent);
-      transition: all 0.3s ease;
+    .pipeline {
+      margin-top: 18px;
+      border-top: 1px solid var(--line);
+      padding-top: 18px;
     }
 
-    .status-msg.error {
-      border-left-color: var(--danger);
-      background: rgba(255, 107, 107, 0.1);
-      color: #ffbcbc;
-    }
-
-    .status-msg.success {
-      border-left-color: var(--success);
-      background: rgba(46, 229, 157, 0.1);
-      color: #bcffde;
-    }
-
-    .pill {
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
+    .pipeline-title {
       color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
 
-    /* Loader */
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .step {
+      min-height: 72px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      border-radius: 11px;
+    }
+
+    .step b {
+      display: block;
+      color: var(--accent);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .step span {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
     .loader {
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,.35);
       border-top-color: #fff;
-      animation: spin 1s linear infinite;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
       display: none;
     }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 860px) {
+      .hero,
+      .workspace { grid-template-columns: 1fr; }
+
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
       }
+
+      .top-meta { justify-content: flex-start; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: min(100% - 24px, 1180px); padding-top: 18px; }
+      .hero-card, .panel { padding: 19px; border-radius: 18px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .preview-container { min-height: 230px; }
+      .pipeline-steps { grid-template-columns: 1fr 1fr; }
+      h1 { font-size: 38px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="blob blob-1"></div>
-  <div class="blob blob-2"></div>
-  <div class="blob blob-3"></div>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">HA</div>
+        <div class="brand-copy">
+          <strong>Handwriting Author Identification</strong>
+          <span>Computer Vision · Deep Learning</span>
+        </div>
+      </div>
 
-  <div class="container">
-    <header class="card header">
-      <h1 class="title">Handwriting Analysis</h1>
-      <p class="subtitle">
-        Deep learning writer identification using computer vision and handwriting structure.
-      </p>
-    </header>
+      <div class="top-meta">
+        <span class="meta-pill">TensorFlow CNN</span>
+        <span class="meta-pill">OpenCV Pipeline</span>
+        <span class="meta-pill">FastAPI</span>
+      </div>
+    </div>
 
-    <main class="grid">
-      <section class="card">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">Writer Identification System</div>
+        <h1>Who wrote this handwriting sample?</h1>
+        <p class="hero-copy">
+          Upload a handwriting image. The system segments the writing, analyzes multiple
+          visual samples with a convolutional neural network, and combines the predictions
+          to identify the most likely writer.
+        </p>
+      </div>
+
+      <div class="metrics">
+        <div class="metric-card">
+          <span class="metric-label">Writer classes</span>
+          <strong class="metric-value">70</strong>
+          <span class="metric-note">Known author identities</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Recorded test accuracy</span>
+          <strong class="metric-value">83.57%</strong>
+          <span class="metric-note">Evaluation pipeline result</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-kicker">Input sample</div>
+            <h2 class="panel-title">Upload handwriting</h2>
+            <p class="panel-subtitle">Use a clear image containing handwritten text.</p>
+          </div>
+          <span class="model-state">Model ready</span>
+        </div>
+
         <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-          <input id="fileInput" type="file" accept="image/*" style="display: none;" />
+          <input id="fileInput" type="file" accept="image/*" style="display:none" />
 
           <div class="preview-container">
-            <img id="previewImg" alt="Thumbnail" />
+            <img id="previewImg" alt="Selected handwriting sample" />
             <div class="hint" id="previewHint">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-              <span>Click to upload handwriting sample</span>
+              <div class="upload-icon">
+                <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M20 15v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4"/>
+                </svg>
+              </div>
+              <strong>Drop a handwriting image here</strong>
+              <span>or click to browse from your device</span>
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span id="fileName" class="pill">No file selected</span>
-            <button class="btn secondary" id="clearBtn" disabled
-              onclick="event.stopPropagation(); clearAll()">Remove</button>
+          <div class="file-row">
+            <span id="fileName" class="file-name">No file selected</span>
           </div>
         </div>
 
-        <button class="btn" id="identifyBtn" disabled style="width: 100%; margin-top: 16px;">
-          <span class="loader" id="loader"></span>
-          <span id="btnText">Execute Analysis</span>
-        </button>
+        <div class="button-row">
+          <button class="btn primary" id="identifyBtn" disabled>
+            <span class="loader" id="loader"></span>
+            <span id="btnText">Identify writer</span>
+          </button>
+          <button class="btn secondary" id="clearBtn" disabled onclick="event.stopPropagation(); clearAll()">Remove</button>
+        </div>
+
+        <div class="pipeline">
+          <div class="pipeline-title">Inference pipeline</div>
+          <div class="pipeline-steps">
+            <div class="step"><b>01</b><span>OpenCV preprocessing</span></div>
+            <div class="step"><b>02</b><span>Segment handwriting</span></div>
+            <div class="step"><b>03</b><span>CNN classification</span></div>
+            <div class="step"><b>04</b><span>Aggregate predictions</span></div>
+          </div>
+        </div>
       </section>
 
-      <section class="card result-section">
-        <label class="pill" style="width: fit-content;">Detection Result</label>
-        <div class="result-box">
-          <div class="author-name" id="authorName">Waiting...</div>
-          <div class="status-msg" id="statusMessage">Upload an image to identify the author.</div>
+      <section class="panel result-panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-kicker">Model output</div>
+            <h2 class="panel-title">Identification result</h2>
+            <p class="panel-subtitle">Prediction across the known writer classes.</p>
+          </div>
+        </div>
 
-          <div class="confidence-wrap" id="confidenceWrap" style="opacity: 0;">
+        <div class="result-box">
+          <div class="result-label">Predicted writer</div>
+          <div class="author-name" id="authorName">—</div>
+          <div class="status-msg" id="statusMessage">Upload a handwriting image to begin analysis.</div>
+
+          <div class="confidence-wrap" id="confidenceWrap" style="opacity:0">
             <div class="confidence-label">
-              <span>Predictive Confidence</span>
+              <span>Model confidence</span>
               <span id="confidenceValue">0%</span>
             </div>
             <div class="progress-bar">
@@ -401,9 +668,9 @@
       </section>
     </main>
 
-    <footer style="text-align: center; color: var(--muted); font-size: 12px; margin-top: 10px;">
-      Deep Learning &bull; Computer Vision &bull; Handwriting Author Identification
-    </footer>
+    <div class="footer">
+      TensorFlow · Keras · OpenCV · FastAPI · 70-class handwriting author identification
+    </div>
   </div>
 
   <script>
@@ -434,7 +701,7 @@
       }
 
       selectedFile = file;
-      fileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      fileName.textContent = `${file.name} · ${(file.size / 1024).toFixed(1)} KB`;
 
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -446,7 +713,7 @@
 
       identifyBtn.disabled = false;
       clearBtn.disabled = false;
-      showStatus("Sample loaded. Ready for analysis.");
+      showStatus("Sample loaded and ready for analysis.");
       resetResultUI();
     });
 
@@ -455,16 +722,16 @@
       fileInput.value = "";
       previewImg.src = "";
       previewImg.style.display = "none";
-      previewHint.style.display = "flex";
+      previewHint.style.display = "block";
       fileName.textContent = "No file selected";
       identifyBtn.disabled = true;
       clearBtn.disabled = true;
       resetResultUI();
-      showStatus("Upload an image to identify the author.");
+      showStatus("Upload a handwriting image to begin analysis.");
     }
 
     function resetResultUI() {
-      authorName.textContent = "Waiting...";
+      authorName.textContent = "—";
       confidenceWrap.style.opacity = "0";
       progressFill.style.width = "0%";
       confidenceValue.textContent = "0%";
@@ -481,7 +748,7 @@
       identifyBtn.disabled = true;
       loader.style.display = "inline-block";
       btnText.textContent = "Analyzing...";
-      showStatus("Transmitting to backend...");
+      showStatus("Processing handwriting sample...");
       resetResultUI();
 
       try {
@@ -499,15 +766,11 @@
         }
 
         const data = await response.json();
-
-        // Success Logic
-        authorName.textContent = data.author;
+        authorName.textContent = data.author === "Unknown" ? "Unknown" : `Writer ${data.author}`;
 
         if (data.confidence !== undefined) {
           confidenceWrap.style.opacity = "1";
           const percent = Math.round(data.confidence * 100);
-
-          // Animate progress
           setTimeout(() => {
             progressFill.style.width = percent + "%";
             confidenceValue.textContent = percent + "%";
@@ -515,9 +778,9 @@
         }
 
         if (data.author === "Unknown") {
-          showStatus(data.message || "Low confidence prediction.", "error");
+          showStatus(data.message || "Low-confidence prediction.", "error");
         } else {
-          showStatus("Analysis Complete. Identity verified.", "success");
+          showStatus("Writer identification complete.", "success");
         }
 
       } catch (err) {
@@ -526,31 +789,35 @@
       } finally {
         identifyBtn.disabled = false;
         loader.style.display = "none";
-        btnText.textContent = "Execute Analysis";
+        btnText.textContent = "Identify writer";
       }
     });
 
-    // Drag and Drop
     const dropZone = document.getElementById("dropZone");
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-      dropZone.addEventListener(evt, (e) => {
+
+    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+      dropZone.addEventListener(eventName, (e) => {
         e.preventDefault();
         e.stopPropagation();
       });
     });
 
-    dropZone.addEventListener('dragover', () => dropZone.style.borderColor = 'var(--accent)');
-    dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = 'rgba(255,255,255,0.15)');
-    dropZone.addEventListener('drop', (e) => {
-      dropZone.style.borderColor = 'rgba(255,255,255,0.15)';
+    dropZone.addEventListener("dragover", () => {
+      dropZone.style.borderColor = "var(--accent)";
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.style.borderColor = "#b8c6c1";
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      dropZone.style.borderColor = "#b8c6c1";
       const file = e.dataTransfer.files[0];
       if (file) {
         fileInput.files = e.dataTransfer.files;
-        fileInput.dispatchEvent(new Event('change'));
+        fileInput.dispatchEvent(new Event("change"));
       }
     });
-
   </script>
 </body>
-
 </html>
