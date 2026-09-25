@@ -221,8 +221,8 @@ The training and test image folders are intentionally excluded from the reposito
 ### 1. Clone
 
 ```bash
-git clone https://github.com/Leroy-laboe/Deep-Learning-hand-writing-recognition-.git
-cd Deep-Learning-hand-writing-recognition-
+git clone https://github.com/Leroy-laboe/handwriting-author-identification.git
+cd handwriting-author-identification
 ```
 
 ### 2. Create a virtual environment
