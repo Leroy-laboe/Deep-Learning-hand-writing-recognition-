@@ -8,6 +8,16 @@ Built as a practical Deep Learning / Computer Vision project with a **FastAPI in
 ![Writers](https://img.shields.io/badge/Writer_Classes-70-6f42c1)
 ![Stack](https://img.shields.io/badge/Stack-TensorFlow%20%7C%20OpenCV%20%7C%20FastAPI-blue)
 
+## Product Preview
+
+### Successful Identification
+
+![Handwriting Author Identification result](./frontend/handwriting_author_identification_result.png)
+
+### Ready State
+
+![Handwriting Author Identification idle interface](./frontend/handwriting_author_identification_idle.png)
+
 ---
 
 ## Overview
@@ -102,6 +112,10 @@ The inference API includes a confidence threshold so very low-confidence inputs 
 
 ### Web inference interface
 A browser UI allows a user to:
+
+![Handwriting identification interface](./frontend/handwriting_author_identification_idle.png)
+
+The interface lets a user:
 
 1. upload a handwriting sample;
 2. preview the image;
